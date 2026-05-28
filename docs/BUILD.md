@@ -7,6 +7,30 @@ Endnutzer braucht **kein** installiertes Python.
 > Wichtig: PyInstaller kann **nicht** cross-kompilieren. Baue Windows-Builds auf
 > Windows, macOS-Builds auf macOS usw.
 
+## 0. Automatischer Cloud-Build (empfohlen) – GitHub Actions
+
+Im Repo liegt der Workflow [`.github/workflows/build.yml`](../.github/workflows/build.yml).
+Er baut Windows-, macOS- und Linux-Versionen parallel auf den passenden
+GitHub-Runnern und stellt sie zum Download bereit.
+
+**So löst du einen Build aus:**
+
+* **Per Tag (erzeugt ein Release mit Download-Dateien):**
+  ```bash
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+  Danach erscheinen unter **Releases** `SmartFolders-Windows.zip`,
+  `SmartFolders-macOS.zip` und `SmartFolders-Linux.tar.gz`.
+* **Manuell:** Reiter **Actions** → „Build downloadable apps" → **Run workflow**.
+  Die Ergebnisse hängen dann als **Artifacts** am jeweiligen Lauf.
+
+Der Cloud-Build verzichtet bewusst auf das schwere neuronale Modell
+(`sentence-transformers`/`torch`), damit die Downloads klein und zuverlässig
+bleiben – die semantische Suche nutzt dann den eingebauten Fallback. Wer das
+volle Modell mitbündeln will, installiert es vor dem Build (siehe Abschnitt 5)
+und baut lokal.
+
 ## 1. Voraussetzungen
 
 ```bash

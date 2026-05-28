@@ -6,14 +6,15 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 dist/
 *.egg-info/
 .eggs/
 *.egg
 pip-wheel-metadata/
 
-# PyInstaller
+# PyInstaller build output (keep the build/ scripts, ignore generated work dir)
+/build/pyi/
+/SmartFolders.spec
 *.spec.bak
 *.manifest
 

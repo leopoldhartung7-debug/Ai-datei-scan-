@@ -60,7 +60,29 @@ python -m smartfolders --minimized  # versteckt in den Tray
 
 ---
 
-## Eigenständige App / .exe bauen
+## Fertige App herunterladen (ohne Python)
+
+Du musst nichts selbst bauen: Bei jedem Versions-Tag erstellt GitHub Actions
+automatisch fertige, doppelklickbare Apps für **Windows, macOS und Linux** und
+hängt sie an ein **Release** an.
+
+1. Im Repo auf **Releases** gehen
+   (`https://github.com/leopoldhartung7-debug/Ai-datei-scan-/releases`).
+2. Beim neuesten Release herunterladen:
+   * **Windows:** `SmartFolders-Windows.zip` → entpacken → `SmartFolders.exe` starten.
+   * **macOS:** `SmartFolders-macOS.zip` → entpacken → `SmartFolders.app` öffnen
+     (beim ersten Mal Rechtsklick → „Öffnen", da nicht signiert).
+   * **Linux:** `SmartFolders-Linux.tar.gz` → entpacken → `./SmartFolders` starten.
+
+Die Bundles enthalten die komplette Laufzeit – **kein Python nötig**.
+
+> Noch kein Release vorhanden? Im Reiter **Actions** den Workflow
+> „Build downloadable apps" per **Run workflow** starten, oder einen Tag pushen:
+> `git tag v1.0.0 && git push origin v1.0.0`.
+
+---
+
+## Selbst bauen (.exe / .app)
 
 ```bash
 python build/build_exe.py            # Ein-Ordner-Build (empfohlen)
@@ -71,8 +93,9 @@ python build/build_exe.py --onefile  # eine einzige Datei
 * **macOS** → `dist/SmartFolders.app`
 * **Linux** → `dist/SmartFolders/SmartFolders`
 
-Das Bundle enthält die komplette Python-Laufzeit und alle Abhängigkeiten – der
-Endnutzer braucht kein installiertes Python. Details: **[docs/BUILD.md](docs/BUILD.md)**
+> Hinweis: PyInstaller baut **nicht** plattformübergreifend – eine Windows-`.exe`
+> entsteht nur auf Windows, eine `.app` nur auf macOS. Genau dafür gibt es den
+> automatischen Cloud-Build oben. Details: **[docs/BUILD.md](docs/BUILD.md)**
 
 ---
 
