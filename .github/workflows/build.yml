@@ -1,8 +1,9 @@
 name: Build downloadable apps
 
-# Builds ready-to-run SmartFolders apps for Windows, macOS and Linux in the
-# cloud (PyInstaller cannot cross-compile, so each OS is built on its own
-# runner) and publishes them as downloadable GitHub Release assets.
+# Builds ready-to-run SmartFolders apps for Windows, macOS (Apple Silicon +
+# Intel) and Linux in the cloud (PyInstaller cannot cross-compile, so each OS
+# is built on its own runner) and publishes them as downloadable GitHub Release
+# assets.
 #
 # Triggers:
 #   * push to main (code/workflow changes)  -> refreshes a rolling "latest" build
@@ -31,7 +32,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build (${{ matrix.artifact }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,9 +41,12 @@ jobs:
           - os: windows-latest
             artifact: windows
             asset: SmartFolders-Windows.zip
-          - os: macos-latest
-            artifact: macos
-            asset: SmartFolders-macOS.zip
+          - os: macos-14            # Apple Silicon (arm64)
+            artifact: macos-apple-silicon
+            asset: SmartFolders-macOS-AppleSilicon.zip
+          - os: macos-13            # Intel (x86_64)
+            artifact: macos-intel
+            asset: SmartFolders-macOS-Intel.zip
           - os: ubuntu-latest
             artifact: linux
             asset: SmartFolders-Linux.tar.gz
@@ -65,27 +69,35 @@ jobs:
             libxcb-image0 libxcb-keysyms1 libxcb-render-util0
 
       - name: Install dependencies
-        # Lean, reliable bundle: GUI + watcher + OCR/media support. The heavy
-        # neural model (sentence-transformers/torch) is intentionally omitted so
-        # the download stays small; semantic search uses the built-in fallback.
+        # Lean, reliable bundle: GUI + watcher + PDF text + OCR support. The
+        # heavy neural model (sentence-transformers/torch) and ImageHash/scipy
+        # are intentionally omitted to keep the download small and the build
+        # robust; semantic search and perceptual de-duplication use the built-in
+        # pure-Python fallbacks.
         run: |
           python -m pip install --upgrade pip
-          pip install PyQt6 watchdog psutil platformdirs Pillow ImageHash PyMuPDF pytesseract send2trash pyinstaller
+          pip install PyQt6 watchdog psutil platformdirs Pillow PyMuPDF pytesseract send2trash pyinstaller
 
       - name: Build the app
         run: python build/build_exe.py
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path dist/SmartFolders -DestinationPath SmartFolders-Windows.zip
+        shell: pwsh
+        run: Compress-Archive -Path dist/SmartFolders -DestinationPath "${{ matrix.asset }}"
 
       - name: Package (macOS)
         if: runner.os == 'macOS'
-        run: ditto -c -k --keepParent "dist/SmartFolders.app" SmartFolders-macOS.zip
+        run: |
+          if [ -d "dist/SmartFolders.app" ]; then
+            ditto -c -k --keepParent "dist/SmartFolders.app" "${{ matrix.asset }}"
+          else
+            ditto -c -k --keepParent "dist/SmartFolders" "${{ matrix.asset }}"
+          fi
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
-        run: tar -czf SmartFolders-Linux.tar.gz -C dist SmartFolders
+        run: tar -czf "${{ matrix.asset }}" -C dist SmartFolders
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

@@ -77,6 +77,11 @@ def build(onefile: bool) -> int:
 
     for h in hidden:
         cmd += ["--hidden-import", h]
+    # Bundle EVERY smartfolders submodule. The UI is imported lazily (deferred
+    # inside functions), which PyInstaller's static analysis can miss - without
+    # this the build would succeed but the frozen app would crash at launch with
+    # a ModuleNotFoundError. This guarantees all views/widgets are included.
+    cmd += ["--collect-submodules", "smartfolders"]
     # collect-all is heavy; only include if the package is importable.
     for pkg in collect_all:
         if _importable(pkg):
@@ -84,6 +89,7 @@ def build(onefile: bool) -> int:
 
     if sys.platform == "darwin":
         cmd += ["--osx-bundle-identifier", "com.smartfolders.app"]
+        # --windowed produces the .app bundle on macOS (alias of --noconsole).
         cmd += ["--windowed"]
 
     cmd.append(str(ENTRY))
