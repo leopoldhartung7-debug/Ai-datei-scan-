@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# SmartFolders - Runtime dependencies
+# ---------------------------------------------------------------------------
+# The application is designed to degrade gracefully: every heavy / optional
+# dependency is wrapped in a try/except inside the code base.  The packages in
+# the "core" block are the only ones strictly required to launch the GUI; the
+# "AI", "OCR" and "media" blocks unlock the corresponding advanced features.
+# ---------------------------------------------------------------------------
+
+# --- Core (required for the desktop app) -----------------------------------
+PyQt6>=6.6,<7.0
+watchdog>=4.0
+psutil>=5.9
+platformdirs>=4.0
+
+# --- AI / semantic search (optional, recommended) --------------------------
+# Pure-python fallbacks exist when these are missing.
+numpy>=1.26
+sentence-transformers>=2.6 ; python_version >= "3.9"
+transformers>=4.40 ; python_version >= "3.9"
+
+# --- OCR (optional) --------------------------------------------------------
+# Requires the native Tesseract binary to be installed separately.
+pytesseract>=0.3.10
+pdf2image>=1.17
+Pillow>=10.0
+
+# --- Media / duplicate detection (optional) --------------------------------
+ImageHash>=4.3
+PyMuPDF>=1.24
