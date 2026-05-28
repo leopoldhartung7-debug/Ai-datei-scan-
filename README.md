@@ -183,4 +183,6 @@ siehe [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Lizenz
 
-MIT – siehe [LICENSE](LICENSE).
+**Proprietär – Alle Rechte vorbehalten.** Kopieren, Weitergeben, Verändern oder
+kommerzielle Nutzung sind ohne ausdrückliche schriftliche Genehmigung des
+Rechteinhabers **nicht gestattet** – siehe [LICENSE](LICENSE).

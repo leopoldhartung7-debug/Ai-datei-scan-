@@ -1,21 +1,52 @@
-MIT License
+SmartFolders - Proprietary Software License
+Copyright (c) 2026 SmartFolders. All Rights Reserved.
 
-Copyright (c) 2026 SmartFolders
+IMPORTANT - READ CAREFULLY.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software, including its source code, object code, documentation, design,
+assets and all associated materials (collectively, the "Software"), is the
+proprietary and confidential property of the copyright holder and is protected
+by copyright and other intellectual property laws and treaties.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. NO LICENSE GRANTED
+   No license, right or interest in the Software is granted to you, whether by
+   implication, estoppel or otherwise, except as expressly stated in a separate
+   written agreement signed by the copyright holder.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. RESTRICTIONS
+   Without the prior written permission of the copyright holder, you MAY NOT,
+   in whole or in part:
+     (a) copy, reproduce, download, store or print the Software;
+     (b) distribute, publish, transmit, sublicense, rent, lease, lend or sell
+         the Software;
+     (c) modify, adapt, translate or create derivative works of the Software;
+     (d) decompile, disassemble, reverse engineer or otherwise attempt to
+         derive the source code (where not already provided);
+     (e) remove, alter or obscure any copyright, trademark or other proprietary
+         notices;
+     (f) use the Software for any commercial purpose or make it available to
+         any third party.
+
+   Viewing the source code (for example, because this repository is publicly
+   visible on a hosting platform) does NOT grant any of the rights above.
+
+3. RESERVATION OF RIGHTS
+   All rights not expressly granted in writing are reserved by the copyright
+   holder.
+
+4. TERMINATION
+   Any breach of this license terminates your right to use the Software
+   immediately and may result in legal action.
+
+5. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+For licensing inquiries or written permission, contact the copyright holder.

@@ -18,6 +18,6 @@ from __future__ import annotations
 __app_name__ = "SmartFolders"
 __version__ = "1.0.0"
 __author__ = "SmartFolders"
-__license__ = "MIT"
+__license__ = "Proprietary - All Rights Reserved"
 
 __all__ = ["__app_name__", "__version__", "__author__", "__license__"]

@@ -8,15 +8,16 @@ version = "1.0.0"
 description = "AI-powered file organization assistant for Windows"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = { text = "Proprietary - All Rights Reserved" }
 authors = [{ name = "SmartFolders" }]
 keywords = ["ai", "files", "organization", "ocr", "semantic-search", "desktop"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: X11 Applications :: Qt",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Desktop Environment :: File Managers",
