@@ -13,6 +13,9 @@ Screenshot_949.png  ->  Python_OpenCV_Error.png
 document.pdf        ->  Mietvertrag_Wohnung.pdf
 ```
 
+> 📖 **Neu hier? Die komplette Schritt-für-Schritt-Anleitung von „Python
+> installieren" bis „App bauen" findest du in [docs/ANLEITUNG.md](docs/ANLEITUNG.md).**
+
 ---
 
 ## Highlights
@@ -98,6 +101,7 @@ SmartFolders/
 ├── build/
 │   └── build_exe.py           # PyInstaller-Build (exe/app)
 ├── docs/
+│   ├── ANLEITUNG.md           # Vollständige Schritt-für-Schritt-Anleitung
 │   ├── INSTALL.md             # Installationsanleitung
 │   ├── BUILD.md               # Build- & EXE-Anleitung
 │   ├── ARCHITECTURE.md        # Architektur + SQLite-Schema
