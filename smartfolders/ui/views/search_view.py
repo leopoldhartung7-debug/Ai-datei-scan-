@@ -40,7 +40,8 @@ class SearchView(QWidget):
 
         hint = QLabel(
             'Ask in plain language, e.g. "Zeig Rechnungen von Amazon", '
-            '"Wo ist mein Lebenslauf?", "Coding screenshots", "PDFs vom März".'
+            '"Wo ist mein Lebenslauf?", "Coding screenshots", "PDFs vom März".\n'
+            "Click a result to open its folder (with the file selected)."
         )
         hint.setObjectName("Muted")
         hint.setWordWrap(True)
@@ -62,7 +63,10 @@ class SearchView(QWidget):
         root.addWidget(self.backend_badge, 0, Qt.AlignmentFlag.AlignLeft)
 
         self.results = QListWidget()
-        self.results.itemDoubleClicked.connect(self._open_item)
+        # A single click on a result opens its containing folder (and selects
+        # the file in the OS file manager: Explorer /select, Finder reveal).
+        self.results.itemClicked.connect(self._open_item)
+        self.results.setCursor(Qt.CursorShape.PointingHandCursor)
         root.addWidget(self.results, 1)
 
         self.status = QLabel("")
