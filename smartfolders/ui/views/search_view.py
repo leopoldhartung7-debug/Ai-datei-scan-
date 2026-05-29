@@ -59,7 +59,7 @@ class SearchView(QWidget):
         bar.addWidget(btn)
         root.addLayout(bar)
 
-        self.backend_badge = Badge(self._backend_text(), "#5b8cff")
+        self.backend_badge = Badge(self._backend_text(), self.engine.config.ui.accent_color)
         root.addWidget(self.backend_badge, 0, Qt.AlignmentFlag.AlignLeft)
 
         self.results = QListWidget()

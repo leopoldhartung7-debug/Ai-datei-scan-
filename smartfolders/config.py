@@ -66,7 +66,7 @@ class AIConfig:
 @dataclass
 class UIConfig:
     theme: str = "dark"                  # "dark" | "light"
-    accent_color: str = "#16c2aa"        # turquoise
+    accent_color: str = "#2563eb"        # strong blue
     start_minimized: bool = False
     minimize_to_tray: bool = True
     close_to_tray: bool = True

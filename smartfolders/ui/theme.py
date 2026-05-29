@@ -27,8 +27,8 @@ class Palette:
     danger: str
 
 
-def dark_palette(accent: str = "#16c2aa") -> Palette:
-    # Matte, neutral grey-black base (no blue tint) with a turquoise accent.
+def dark_palette(accent: str = "#2563eb") -> Palette:
+    # Matte, neutral grey-black base with a strong blue accent.
     return Palette(
         name="dark",
         bg="#121214",
@@ -47,7 +47,7 @@ def dark_palette(accent: str = "#16c2aa") -> Palette:
     )
 
 
-def light_palette(accent: str = "#0fa794") -> Palette:
+def light_palette(accent: str = "#2563eb") -> Palette:
     return Palette(
         name="light",
         bg="#f4f6fb",
@@ -246,7 +246,7 @@ def build_stylesheet(p: Palette) -> str:
     QPushButton#Chip:hover {{
         background: {p.accent};
         border: 1px solid {p.accent};
-        color: #06201c;
+        color: {p.accent_fg};
     }}
     """
 
