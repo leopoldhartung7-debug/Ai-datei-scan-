@@ -21,30 +21,33 @@ class Palette:
     text_muted: str
     accent: str
     accent_hover: str
+    accent_fg: str   # readable text/icon colour on top of the accent fill
     success: str
     warning: str
     danger: str
 
 
-def dark_palette(accent: str = "#5b8cff") -> Palette:
+def dark_palette(accent: str = "#16c2aa") -> Palette:
+    # Matte, neutral grey-black base (no blue tint) with a turquoise accent.
     return Palette(
         name="dark",
-        bg="#0f1117",
-        bg_elevated="#151823",
-        surface="#1b1f2e",
-        surface_hover="#232838",
-        border="#2a3042",
-        text="#e8eaf0",
-        text_muted="#9aa0b4",
+        bg="#121214",
+        bg_elevated="#191a1d",
+        surface="#202125",
+        surface_hover="#292b30",
+        border="#34363c",
+        text="#ecedee",
+        text_muted="#9b9da5",
         accent=accent,
         accent_hover=_lighten(accent),
+        accent_fg=_fg_for(accent),
         success="#3ecf8e",
         warning="#f5a623",
         danger="#ff5c6c",
     )
 
 
-def light_palette(accent: str = "#3a6df0") -> Palette:
+def light_palette(accent: str = "#0fa794") -> Palette:
     return Palette(
         name="light",
         bg="#f4f6fb",
@@ -56,6 +59,7 @@ def light_palette(accent: str = "#3a6df0") -> Palette:
         text_muted="#5c6478",
         accent=accent,
         accent_hover=_darken(accent),
+        accent_fg=_fg_for(accent),
         success="#1f9d62",
         warning="#c9820a",
         danger="#e23744",
@@ -101,7 +105,7 @@ def build_stylesheet(p: Palette) -> str:
     QPushButton#NavButton:hover {{ background: {p.surface_hover}; color: {p.text}; }}
     QPushButton#NavButton:checked {{
         background: {p.accent};
-        color: white;
+        color: {p.accent_fg};
         font-weight: 600;
     }}
 
@@ -145,7 +149,7 @@ def build_stylesheet(p: Palette) -> str:
     QPushButton#Primary {{
         background: {p.accent};
         border: none;
-        color: white;
+        color: {p.accent_fg};
         font-weight: 600;
     }}
     QPushButton#Primary:hover {{ background: {p.accent_hover}; }}
@@ -176,7 +180,7 @@ def build_stylesheet(p: Palette) -> str:
     }}
     QListWidget::item, QTreeWidget::item {{ padding: 8px; border-radius: 8px; }}
     QListWidget::item:selected, QTreeWidget::item:selected {{
-        background: {p.accent}; color: white;
+        background: {p.accent}; color: {p.accent_fg};
     }}
     QListWidget::item:hover, QTreeWidget::item:hover {{ background: {p.surface_hover}; }}
     QHeaderView::section {{
@@ -229,6 +233,21 @@ def build_stylesheet(p: Palette) -> str:
         border: 1px solid {p.border}; padding: 6px; border-radius: 6px;
     }}
     QFrame#Badge {{ border-radius: 9px; padding: 2px 8px; }}
+
+    /* Quick-access search chips */
+    QPushButton#Chip {{
+        background: {p.surface};
+        border: 1px solid {p.border};
+        border-radius: 15px;
+        padding: 6px 15px;
+        color: {p.text_muted};
+        font-weight: 500;
+    }}
+    QPushButton#Chip:hover {{
+        background: {p.accent};
+        border: 1px solid {p.accent};
+        color: #06201c;
+    }}
     """
 
 
@@ -265,3 +284,14 @@ def _to_rgb(hex_color: str) -> tuple[int, int, int]:
 
 def _to_hex(r: int, g: int, b: int) -> str:
     return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def _fg_for(hex_color: str) -> str:
+    """Pick a dark or light foreground for text placed on top of *hex_color*.
+
+    Uses perceived luminance so the accent stays readable no matter which colour
+    the user chooses (dark text on bright turquoise, white text on deep blue).
+    """
+    r, g, b = _to_rgb(hex_color)
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return "#06201c" if luminance > 140 else "#ffffff"
