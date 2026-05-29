@@ -229,6 +229,35 @@ class RulesView(QWidget):
         templates_card.body().addLayout(grid)
         root.addWidget(templates_card)
 
+        # --- Quick rule by filename (the simplest possible rule) -------------
+        quick = Card("Schnellregel: nach Dateiname einsortieren")
+        qrow = QHBoxLayout()
+        qrow.setSpacing(8)
+        qrow.addWidget(QLabel("Wenn Dateiname"))
+        self.q_match = QComboBox()
+        self.q_match.addItem("enthält", ConditionOp.CONTAINS)
+        self.q_match.addItem("beginnt mit", ConditionOp.STARTS_WITH)
+        self.q_match.addItem("endet mit", ConditionOp.ENDS_WITH)
+        qrow.addWidget(self.q_match)
+        self.q_text = QLineEdit()
+        self.q_text.setPlaceholderText("z. B. Rechnung")
+        qrow.addWidget(self.q_text, 1)
+        qrow.addWidget(QLabel("→ verschieben nach"))
+        self.q_dest = QLineEdit()
+        self.q_dest.setPlaceholderText("z. B. Dokumente/Rechnungen")
+        qrow.addWidget(self.q_dest, 1)
+        q_browse = QPushButton("Durchsuchen…")
+        q_browse.clicked.connect(self._browse_quick_dest)
+        qrow.addWidget(q_browse)
+        q_add = QPushButton("Regel hinzufügen")
+        q_add.setObjectName("Primary")
+        q_add.clicked.connect(self._add_quick_rule)
+        qrow.addWidget(q_add)
+        self.q_text.returnPressed.connect(self._add_quick_rule)
+        self.q_dest.returnPressed.connect(self._add_quick_rule)
+        quick.body().addLayout(qrow)
+        root.addWidget(quick)
+
         info = QLabel(
             "Aktiviere eine Regel mit dem Häkchen. Reihenfolge nach Priorität. "
             "Doppelklick zum Bearbeiten. Damit Regeln Dateien verschieben, in "
@@ -268,6 +297,32 @@ class RulesView(QWidget):
             item.setData(Qt.ItemDataRole.UserRole, rule.id)
             self.list.addItem(item)
         self.list.blockSignals(False)
+
+    def _browse_quick_dest(self) -> None:
+        folder = QFileDialog.getExistingDirectory(self, "Zielordner wählen")
+        if folder:
+            self.q_dest.setText(folder)
+
+    def _add_quick_rule(self) -> None:
+        text = self.q_text.text().strip()
+        dest = self.q_dest.text().strip()
+        if not text or not dest:
+            self.status.setText("Bitte Dateiname-Text und Zielordner angeben.")
+            return
+        op = self.q_match.currentData()
+        op_label = self.q_match.currentText()
+        rule = Rule(
+            name=f"Name {op_label} '{text}' -> {dest}",
+            priority=50,
+            conditions=[RuleCondition(ConditionField.NAME, op, text)],
+            actions=[RuleAction(ActionType.MOVE, dest)],
+        )
+        self.engine.db.save_rule(rule)
+        self.engine.reload_rules()
+        self.refresh()
+        self.q_text.clear()
+        self.q_dest.clear()
+        self.status.setText(f"Regel hinzugefügt: Dateiname {op_label} '{text}' -> {dest}")
 
     def _add_template(self, name: str) -> None:
         existing = {r.name for r in self.engine.db.get_rules()}
