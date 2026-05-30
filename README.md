@@ -70,8 +70,7 @@ fertige, doppelklickbare Apps für **Windows, macOS und Linux** und stellt sie a
    (`https://github.com/leopoldhartung7-debug/Ai-datei-scan-/releases`).
 2. Beim Release **„Latest build"** herunterladen:
    * **Windows:** `SmartFolders-Windows.zip` → entpacken → `SmartFolders.exe` starten.
-   * **macOS (Apple Silicon, M1/M2/M3):** `SmartFolders-macOS-AppleSilicon.zip`
-   * **macOS (Intel):** `SmartFolders-macOS-Intel.zip`
+   * **macOS** (Apple Silicon nativ, Intel über Rosetta): `SmartFolders-macOS.zip`
      → entpacken → `SmartFolders.app` per **Rechtsklick → „Öffnen"** (einmalig, da nicht signiert).
    * **Linux:** `SmartFolders-Linux.tar.gz` → entpacken → `./SmartFolders` starten.
 

@@ -34,6 +34,10 @@ jobs:
   build:
     name: Build (${{ matrix.artifact }})
     runs-on: ${{ matrix.os }}
+    # Keep a single platform failure from killing the whole build / blocking the
+    # release job; combined with the release job's "if: always()" this ensures
+    # whichever platforms succeed are always shipped to users.
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -41,12 +45,9 @@ jobs:
           - os: windows-latest
             artifact: windows
             asset: SmartFolders-Windows.zip
-          - os: macos-14            # Apple Silicon (arm64)
-            artifact: macos-apple-silicon
-            asset: SmartFolders-macOS-AppleSilicon.zip
-          - os: macos-13            # Intel (x86_64)
-            artifact: macos-intel
-            asset: SmartFolders-macOS-Intel.zip
+          - os: macos-latest        # Apple Silicon; Intel runs via Rosetta
+            artifact: macos
+            asset: SmartFolders-macOS.zip
           - os: ubuntu-latest
             artifact: linux
             asset: SmartFolders-Linux.tar.gz
@@ -144,9 +145,9 @@ jobs:
             ## Downloads
 
             - **Windows:** `SmartFolders-Windows.zip` -> entpacken -> `SmartFolders.exe` starten.
-            - **macOS (Apple Silicon, M1/M2/M3):** `SmartFolders-macOS-AppleSilicon.zip`
-            - **macOS (Intel):** `SmartFolders-macOS-Intel.zip`
-              -> entpacken -> **Rechtsklick auf `SmartFolders.app` -> "Öffnen"** (einmalig).
+            - **macOS** (Apple Silicon nativ, Intel via Rosetta):
+              `SmartFolders-macOS.zip` -> entpacken ->
+              **Rechtsklick auf `SmartFolders.app` -> "Öffnen"** (einmalig).
               Falls macOS sagt "App ist beschädigt / kann nicht geöffnet werden",
               im Terminal einmal ausführen:
               `xattr -dr com.apple.quarantine /Pfad/zu/SmartFolders.app`
