@@ -206,7 +206,7 @@ class RulesView(QWidget):
         root.setSpacing(14)
 
         header = QHBoxLayout()
-        title = QLabel("Rules & Automation")
+        title = QLabel("Regeln & Automatisierung")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
@@ -383,11 +383,58 @@ class RulesView(QWidget):
         return None
 
 
+_FIELD_DE = {
+    ConditionField.CATEGORY: "Kategorie",
+    ConditionField.EXTENSION: "Endung",
+    ConditionField.NAME: "Dateiname",
+    ConditionField.SIZE: "Größe",
+    ConditionField.AGE_DAYS: "Alter (Tage)",
+    ConditionField.CONTENT: "Inhalt",
+    ConditionField.TAG: "Tag",
+}
+_OP_DE = {
+    ConditionOp.EQUALS: "ist",
+    ConditionOp.NOT_EQUALS: "ist nicht",
+    ConditionOp.CONTAINS: "enthält",
+    ConditionOp.STARTS_WITH: "beginnt mit",
+    ConditionOp.ENDS_WITH: "endet mit",
+    ConditionOp.MATCHES: "passt zu",
+    ConditionOp.GREATER_THAN: ">",
+    ConditionOp.LESS_THAN: "<",
+    ConditionOp.IN: "in",
+}
+_ACTION_DE = {
+    ActionType.MOVE: "verschieben nach",
+    ActionType.COPY: "kopieren nach",
+    ActionType.ARCHIVE: "archivieren in",
+    ActionType.RENAME: "umbenennen zu",
+    ActionType.TAG: "taggen mit",
+    ActionType.DELETE: "löschen",
+    ActionType.SET_CATEGORY: "Kategorie setzen auf",
+    ActionType.IGNORE: "ignorieren",
+}
+
+
+def _pretty_value(c: RuleCondition) -> str:
+    """Show category values with their German label instead of the raw enum string."""
+    if c.field is ConditionField.CATEGORY:
+        try:
+            return Category(c.value).label
+        except (ValueError, KeyError):
+            return c.value
+    return c.value
+
+
 def _summarise(rule: Rule) -> str:
     conds = " UND ".join(
-        f"{c.field.value} {c.op.value} '{c.value}'" for c in rule.conditions
+        f"{_FIELD_DE.get(c.field, c.field.value)} {_OP_DE.get(c.op, c.op.value)} "
+        f"»{_pretty_value(c)}«"
+        for c in rule.conditions
     ) or "(keine Bedingung)"
-    acts = ", ".join(f"{a.type.value} {a.target}".strip() for a in rule.actions) or "(keine Aktion)"
+    acts = ", ".join(
+        f"{_ACTION_DE.get(a.type, a.type.value)} {a.target}".strip()
+        for a in rule.actions
+    ) or "(keine Aktion)"
     return f"[{rule.priority}] {rule.name}\n    WENN {conds}\n    DANN {acts}"
 
 

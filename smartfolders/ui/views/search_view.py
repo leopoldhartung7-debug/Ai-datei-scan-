@@ -34,14 +34,14 @@ class SearchView(QWidget):
         root.setContentsMargins(28, 24, 28, 24)
         root.setSpacing(14)
 
-        title = QLabel("AI Search")
+        title = QLabel("KI-Suche")
         title.setObjectName("H1")
         root.addWidget(title)
 
         hint = QLabel(
-            'Ask in plain language, e.g. "Zeig Rechnungen von Amazon", '
-            '"Wo ist mein Lebenslauf?", "Coding screenshots", "PDFs vom März".\n'
-            "Click a result to open its folder (with the file selected)."
+            "Frag in natürlicher Sprache, z. B. »Zeig Rechnungen von Amazon«, "
+            "»Wo ist mein Lebenslauf?«, »Coding-Screenshots« oder »PDFs vom März«.\n"
+            "Ein Klick auf ein Ergebnis öffnet den Ordner und markiert die Datei."
         )
         hint.setObjectName("Muted")
         hint.setWordWrap(True)
@@ -50,10 +50,10 @@ class SearchView(QWidget):
         bar = QHBoxLayout()
         self.input = QLineEdit()
         self.input.setObjectName("GlobalSearch")
-        self.input.setPlaceholderText("Search your files...")
+        self.input.setPlaceholderText("Suchbegriff oder Frage …")
         self.input.returnPressed.connect(self.run_search)
         bar.addWidget(self.input, 1)
-        btn = QPushButton("Search")
+        btn = QPushButton("Suchen")
         btn.setObjectName("Primary")
         btn.clicked.connect(self.run_search)
         bar.addWidget(btn)
@@ -76,10 +76,10 @@ class SearchView(QWidget):
     def _backend_text(self) -> str:
         emb = self.engine.embeddings
         if emb and emb.is_ml_backend:
-            return f"Semantic model: {emb.model_name}"
+            return f"Semantisches Modell: {emb.model_name}"
         if emb:
-            return "Semantic model: lightweight fallback (install AI extras for best quality)"
-        return "Keyword search only (semantic search disabled)"
+            return "Semantisches Modell: leichter Fallback (KI-Extras für beste Qualität installieren)"
+        return "Nur Stichwortsuche (semantische Suche deaktiviert)"
 
     def focus_search(self, text: str = "") -> None:
         if text:
@@ -95,18 +95,21 @@ class SearchView(QWidget):
             return
         hits = self.engine.query(query, limit=80)
         if not hits:
-            self.status.setText("No matches found.")
+            self.status.setText("Keine Treffer gefunden.")
             return
-        self.status.setText(f"{len(hits)} result(s)")
+        self.status.setText(f"{len(hits)} Treffer")
         for hit in hits:
             rec = hit.record
             exists = Path(rec.path).exists()
             tag = f"[{rec.category.label}]"
-            mark = "" if exists else "  (missing)"
+            mark = "" if exists else "   (fehlt)"
+            match_de = {"keyword": "Stichwort", "semantic": "Bedeutung"}.get(
+                hit.matched_on, hit.matched_on
+            )
             text = (
-                f"{rec.name}  {tag}\n"
-                f"    {rec.path}  -  {human_size(rec.size)}  -  "
-                f"match: {hit.matched_on}  score: {hit.score:.2f}{mark}"
+                f"{rec.name}   {tag}\n"
+                f"    {rec.path}   ·   {human_size(rec.size)}   ·   "
+                f"Treffer: {match_de}   ·   Score: {hit.score:.2f}{mark}"
             )
             item = QListWidgetItem(text)
             item.setData(Qt.ItemDataRole.UserRole, rec.path)

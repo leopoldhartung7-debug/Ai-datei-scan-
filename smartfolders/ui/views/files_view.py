@@ -36,31 +36,31 @@ class FilesView(QWidget):
         root.setSpacing(14)
 
         header = QHBoxLayout()
-        title = QLabel("Files")
+        title = QLabel("Dateien")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
 
         self.filter_box = QLineEdit()
-        self.filter_box.setPlaceholderText("Filter by name...")
+        self.filter_box.setPlaceholderText("Nach Name filtern …")
         self.filter_box.setFixedWidth(220)
         self.filter_box.textChanged.connect(self.refresh)
         header.addWidget(self.filter_box)
 
         self.category_combo = QComboBox()
-        self.category_combo.addItem("All categories", "")
+        self.category_combo.addItem("Alle Kategorien", "")
         for cat in Category:
             self.category_combo.addItem(cat.label, cat.value)
         self.category_combo.currentIndexChanged.connect(self.refresh)
         header.addWidget(self.category_combo)
 
-        refresh_btn = QPushButton("Refresh")
+        refresh_btn = QPushButton("Aktualisieren")
         refresh_btn.clicked.connect(self.refresh)
         header.addWidget(refresh_btn)
         root.addLayout(header)
 
         self.table = QTableWidget(0, 5)
-        self.table.setHorizontalHeaderLabels(["Name", "Category", "Size", "Tags", "Indexed"])
+        self.table.setHorizontalHeaderLabels(["Name", "Kategorie", "Größe", "Tags", "Indexiert"])
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -93,7 +93,7 @@ class FilesView(QWidget):
             self._set(r, 3, ", ".join(rec.tags[:6]))
             ts = time.strftime("%Y-%m-%d %H:%M", time.localtime(rec.indexed_at)) if rec.indexed_at else ""
             self._set(r, 4, ts)
-        self.count_label.setText(f"{len(rows)} file(s)")
+        self.count_label.setText(f"{len(rows)} Datei(en)")
 
     def _set(self, row: int, col: int, text: str, path: str | None = None) -> None:
         item = QTableWidgetItem(text)

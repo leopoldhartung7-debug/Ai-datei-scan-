@@ -111,6 +111,14 @@ def build_stylesheet(p: Palette) -> str:
 
     /* Top bar */
     QWidget#TopBar {{ background: {p.bg}; border-bottom: 1px solid {p.border}; }}
+
+    /* Bottom status bar */
+    QWidget#StatusBar {{
+        background: {p.bg_elevated};
+        border-top: 1px solid {p.border};
+        color: {p.text_muted};
+    }}
+    QWidget#StatusBar QLabel {{ font-size: 12px; }}
     QLineEdit#GlobalSearch {{
         background: {p.surface};
         border: 1px solid {p.border};

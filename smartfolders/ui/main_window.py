@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from .. import __version__
 from ..config import AppConfig
 from ..core.events import Event, EventType
 from ..engine import SmartFoldersEngine
@@ -33,12 +34,12 @@ from .widgets import NavButton
 
 NAV_ITEMS = [
     ("Dashboard", "dashboard"),
-    ("Search", "search"),
-    ("Files", "files"),
-    ("Rules", "rules"),
-    ("Duplicates", "duplicates"),
-    ("Optimize", "optimize"),
-    ("Settings", "settings"),
+    ("Suche", "search"),
+    ("Dateien", "files"),
+    ("Regeln", "rules"),
+    ("Duplikate", "duplicates"),
+    ("Optimieren", "optimize"),
+    ("Einstellungen", "settings"),
 ]
 
 
@@ -90,9 +91,11 @@ class MainWindow(QWidget):
         ):
             self.stack.addWidget(view)
         right_layout.addWidget(self.stack, 1)
+        right_layout.addWidget(self._status_bar())
         root.addWidget(right, 1)
 
         self._select(0)
+        self._refresh_status_bar()
 
     def _sidebar(self) -> QWidget:
         sidebar = QWidget()
@@ -104,7 +107,7 @@ class MainWindow(QWidget):
 
         logo = QLabel("SmartFolders")
         logo.setObjectName("Logo")
-        sub = QLabel("AI file assistant")
+        sub = QLabel("KI-Dateiassistent")
         sub.setObjectName("LogoSub")
         layout.addWidget(logo)
         layout.addWidget(sub)
@@ -118,10 +121,6 @@ class MainWindow(QWidget):
             layout.addWidget(btn)
 
         layout.addStretch(1)
-        self.engine_status = QLabel("  Engine: stopped")
-        self.engine_status.setObjectName("Muted")
-        self.engine_status.setContentsMargins(12, 0, 12, 8)
-        layout.addWidget(self.engine_status)
         return sidebar
 
     def _topbar(self) -> QWidget:
@@ -133,7 +132,9 @@ class MainWindow(QWidget):
 
         self.global_search = QLineEdit()
         self.global_search.setObjectName("GlobalSearch")
-        self.global_search.setPlaceholderText("Search your files in plain language...   (Enter)")
+        self.global_search.setPlaceholderText(
+            "Durchsuche deine Dateien in natürlicher Sprache …   (Enter zum Suchen)"
+        )
         self.global_search.returnPressed.connect(self._global_search)
         layout.addWidget(self.global_search, 1)
         return bar
@@ -148,6 +149,47 @@ class MainWindow(QWidget):
             on_quit=self._quit,
         )
         self.tray.show()
+
+    # ------------------------------------------------------------------ status
+    def _status_bar(self) -> QWidget:
+        bar = QWidget()
+        bar.setObjectName("StatusBar")
+        bar.setFixedHeight(34)
+        layout = QHBoxLayout(bar)
+        layout.setContentsMargins(22, 0, 22, 0)
+        layout.setSpacing(14)
+        self.status_dot = QLabel("●")
+        self.status_dot.setStyleSheet("color: #9aa0b4; font-size: 14px;")
+        self.status_text = QLabel("Engine bereit")
+        self.status_files = QLabel("0 Dateien")
+        self.status_files.setObjectName("Muted")
+        self.status_backend = QLabel("")
+        self.status_backend.setObjectName("Muted")
+        for w in (self.status_dot, self.status_text):
+            layout.addWidget(w)
+        layout.addWidget(_dot_separator())
+        layout.addWidget(self.status_files)
+        layout.addWidget(_dot_separator())
+        layout.addWidget(self.status_backend)
+        layout.addStretch(1)
+        version_lbl = QLabel(f"SmartFolders · v{__version__}")
+        version_lbl.setObjectName("Muted")
+        layout.addWidget(version_lbl)
+        return bar
+
+    def _refresh_status_bar(self) -> None:
+        from ..utils.paths import human_size as _hs
+
+        running = self.engine.is_running
+        self.status_dot.setStyleSheet(
+            f"color: {'#3ecf8e' if running else '#9aa0b4'}; font-size: 14px;"
+        )
+        self.status_text.setText("Engine läuft" if running else "Engine bereit")
+        count = self.engine.db.count_files()
+        size = self.engine.db.total_size()
+        self.status_files.setText(f"{count:,} Dateien · {_hs(size)}".replace(",", "."))
+        backend = self.engine.watcher.backend if hasattr(self.engine, "watcher") else "—"
+        self.status_backend.setText(f"Backend: {backend}")
 
     # ------------------------------------------------------------------ nav
     def _select(self, index: int) -> None:
@@ -170,11 +212,15 @@ class MainWindow(QWidget):
     def _on_event(self, ev: Event) -> None:
         self.dashboard.on_event(ev)
         if ev.type in (EventType.ENGINE_STARTED, EventType.ENGINE_STOPPED):
-            running = ev.type is EventType.ENGINE_STARTED
-            self.engine_status.setText(f"  Engine: {'running' if running else 'stopped'}")
-            self.tray.set_engine_running(running)
+            self.tray.set_engine_running(ev.type is EventType.ENGINE_STARTED)
+            self._refresh_status_bar()
+        if ev.type in (EventType.FILE_INDEXED, EventType.STATS_UPDATED, EventType.SCAN_FINISHED):
+            self._refresh_status_bar()
         if ev.type is EventType.SCAN_FINISHED and self.config.ui.show_notifications:
-            self.tray.notify("Scan complete", f"Queued {ev.payload.get('queued', 0)} files.")
+            self.tray.notify(
+                "Scan abgeschlossen",
+                f"{ev.payload.get('queued', 0)} Dateien in Warteschlange.",
+            )
         if ev.type is EventType.NOTIFY and self.config.ui.show_notifications:
             self.tray.notify(ev.payload.get("title", "SmartFolders"), ev.payload.get("message", ""))
 
@@ -231,4 +277,11 @@ class MainWindow(QWidget):
         event.ignore()
         self.hide()
         if self.config.ui.show_notifications:
-            self.tray.notify("SmartFolders", "Still running in the background.")
+            self.tray.notify("SmartFolders", "Läuft weiter im Hintergrund.")
+
+
+def _dot_separator() -> QLabel:
+    """Small bullet used to visually separate items in the status bar."""
+    sep = QLabel("·")
+    sep.setStyleSheet("color: #555861;")
+    return sep

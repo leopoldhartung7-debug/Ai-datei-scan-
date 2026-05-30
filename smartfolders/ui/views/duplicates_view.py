@@ -45,19 +45,20 @@ class DuplicatesView(QWidget):
         root.setSpacing(14)
 
         header = QHBoxLayout()
-        title = QLabel("Duplicate Finder")
+        title = QLabel("Duplikat-Finder")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
-        self.scan_btn = QPushButton("Scan for duplicates")
+        self.scan_btn = QPushButton("Duplikate suchen")
         self.scan_btn.setObjectName("Primary")
         self.scan_btn.clicked.connect(self._scan)
         header.addWidget(self.scan_btn)
         root.addLayout(header)
 
         info = QLabel(
-            "Finds byte-identical files (exact) and visually similar images (perceptual). "
-            "Tick the copies you want to remove - they are moved to the trash, not deleted."
+            "Findet bytegleiche Dateien (exakt) sowie visuell ähnliche Bilder (perzeptuell). "
+            "Hake die Kopien an, die du entfernen willst — sie landen im Papierkorb, "
+            "werden also nicht endgültig gelöscht."
         )
         info.setObjectName("Muted")
         info.setWordWrap(True)
@@ -69,7 +70,7 @@ class DuplicatesView(QWidget):
         root.addWidget(self.progress)
 
         self.tree = QTreeWidget()
-        self.tree.setHeaderLabels(["File", "Size", "Path"])
+        self.tree.setHeaderLabels(["Datei", "Größe", "Pfad"])
         self.tree.setColumnWidth(0, 280)
         self.tree.itemDoubleClicked.connect(self._open)
         root.addWidget(self.tree, 1)
@@ -79,7 +80,7 @@ class DuplicatesView(QWidget):
         self.summary.setObjectName("Muted")
         bottom.addWidget(self.summary)
         bottom.addStretch(1)
-        self.delete_btn = QPushButton("Move ticked to trash")
+        self.delete_btn = QPushButton("Markierte in den Papierkorb")
         self.delete_btn.setObjectName("Danger")
         self.delete_btn.clicked.connect(self._delete_ticked)
         self.delete_btn.setEnabled(False)
@@ -99,9 +100,13 @@ class DuplicatesView(QWidget):
         self.scan_btn.setEnabled(True)
         self.delete_btn.setEnabled(bool(groups))
         total_waste = 0
+        kind_de = {"exact": "Exakt", "similar": "Ähnlich"}
         for g in groups:
             total_waste += g.wasted_bytes
-            label = f"{g.kind.title()} group - {g.count} files - {human_size(g.wasted_bytes)} reclaimable"
+            label = (
+                f"{kind_de.get(g.kind, g.kind.title())}-Gruppe   ·   "
+                f"{g.count} Dateien   ·   {human_size(g.wasted_bytes)} freisetzbar"
+            )
             parent = QTreeWidgetItem([label, "", ""])
             self.tree.addTopLevelItem(parent)
             parent.setExpanded(True)
@@ -114,10 +119,10 @@ class DuplicatesView(QWidget):
                 parent.addChild(child)
         n_groups = self.tree.topLevelItemCount()
         if n_groups == 0:
-            self.summary.setText("No duplicates found. Your files are tidy!")
+            self.summary.setText("Keine Duplikate gefunden — deine Dateien sind ordentlich!")
         else:
             self.summary.setText(
-                f"{n_groups} group(s) - up to {human_size(total_waste)} can be reclaimed"
+                f"{n_groups} Gruppe(n)   ·   bis zu {human_size(total_waste)} freisetzbar"
             )
 
     def _delete_ticked(self) -> None:
@@ -129,16 +134,20 @@ class DuplicatesView(QWidget):
                 if child.checkState(0) == Qt.CheckState.Checked:
                     paths.append(child.data(0, Qt.ItemDataRole.UserRole))
         if not paths:
-            QMessageBox.information(self, "Nothing selected", "Tick the copies to remove first.")
+            QMessageBox.information(
+                self, "Nichts ausgewählt", "Hake zuerst die zu entfernenden Kopien an."
+            )
             return
         if QMessageBox.question(
-            self, "Move to trash", f"Move {len(paths)} file(s) to the trash?"
+            self, "In den Papierkorb", f"{len(paths)} Datei(en) in den Papierkorb verschieben?"
         ) != QMessageBox.StandardButton.Yes:
             return
         for path in paths:
             send_to_trash(path)
             self.engine.db.delete_file(path)
-        QMessageBox.information(self, "Done", f"Moved {len(paths)} file(s) to the trash.")
+        QMessageBox.information(
+            self, "Fertig", f"{len(paths)} Datei(en) in den Papierkorb verschoben."
+        )
         self._scan()
 
     def _open(self, item: QTreeWidgetItem) -> None:

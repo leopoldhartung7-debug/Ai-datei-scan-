@@ -28,15 +28,15 @@ class TrayController:
         self.tray.setToolTip("SmartFolders")
 
         menu = QMenu()
-        self._open_action = menu.addAction("Open SmartFolders")
+        self._open_action = menu.addAction("SmartFolders öffnen")
         self._open_action.triggered.connect(lambda: on_show())
         menu.addSeparator()
-        self._engine_action = menu.addAction("Start engine")
+        self._engine_action = menu.addAction("Engine starten")
         self._engine_action.triggered.connect(lambda: on_toggle_engine())
-        scan_action: QAction = menu.addAction("Scan now")
+        scan_action: QAction = menu.addAction("Jetzt scannen")
         scan_action.triggered.connect(lambda: on_scan())
         menu.addSeparator()
-        quit_action = menu.addAction("Quit")
+        quit_action = menu.addAction("Beenden")
         quit_action.triggered.connect(lambda: on_quit())
 
         self.tray.setContextMenu(menu)
@@ -55,8 +55,8 @@ class TrayController:
 
     def set_engine_running(self, running: bool) -> None:
         self.tray.setIcon(tray_icon(self._accent, active=running))
-        self._engine_action.setText("Stop engine" if running else "Start engine")
-        self.tray.setToolTip(f"SmartFolders - {'running' if running else 'stopped'}")
+        self._engine_action.setText("Engine stoppen" if running else "Engine starten")
+        self.tray.setToolTip(f"SmartFolders — {'läuft' if running else 'bereit'}")
 
     def notify(self, title: str, message: str) -> None:
         if self.available:

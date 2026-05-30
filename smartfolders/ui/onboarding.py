@@ -28,9 +28,9 @@ class OnboardingWizard(QWizard):
     def __init__(self, config: AppConfig, parent=None) -> None:
         super().__init__(parent)
         self.config = config
-        self.setWindowTitle("Welcome to SmartFolders")
+        self.setWindowTitle("Willkommen bei SmartFolders")
         self.setWizardStyle(QWizard.WizardStyle.ModernStyle)
-        self.setMinimumSize(560, 460)
+        self.setMinimumSize(580, 480)
         self.addPage(_WelcomePage())
         self.folders_page = _FoldersPage(config)
         self.addPage(self.folders_page)
@@ -50,13 +50,13 @@ class OnboardingWizard(QWizard):
 class _WelcomePage(QWizardPage):
     def __init__(self) -> None:
         super().__init__()
-        self.setTitle("Your AI file assistant")
+        self.setTitle("Dein KI-Dateiassistent")
         layout = QVBoxLayout(self)
         text = QLabel(
-            "SmartFolders watches your folders and automatically classifies, "
-            "renames, de-duplicates and indexes your files - completely offline.\n\n"
-            "Everything stays on your machine. No cloud, no telemetry.\n\n"
-            "Let's set things up in a few quick steps."
+            "SmartFolders überwacht deine Ordner und klassifiziert, benennt um, "
+            "entduplifiziert und indexiert deine Dateien automatisch — komplett offline.\n\n"
+            "Alles bleibt auf deinem Gerät. Keine Cloud, keine Telemetrie.\n\n"
+            "Lass uns in wenigen Schritten einrichten."
         )
         text.setWordWrap(True)
         layout.addWidget(text)
@@ -65,17 +65,19 @@ class _WelcomePage(QWizardPage):
 class _FoldersPage(QWizardPage):
     def __init__(self, config: AppConfig) -> None:
         super().__init__()
-        self.setTitle("Folders to watch")
+        self.setTitle("Welche Ordner sollen überwacht werden?")
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("SmartFolders will monitor these folders for new files:"))
+        layout.addWidget(QLabel(
+            "Diese Ordner werden auf neue Dateien überwacht:"
+        ))
         self.list = QListWidget()
         for folder in config.watched_folders:
             self.list.addItem(QListWidgetItem(folder))
         layout.addWidget(self.list)
         row = QHBoxLayout()
-        add = QPushButton("Add folder")
+        add = QPushButton("Ordner hinzufügen")
         add.clicked.connect(self._add)
-        remove = QPushButton("Remove")
+        remove = QPushButton("Entfernen")
         remove.clicked.connect(self._remove)
         row.addWidget(add)
         row.addWidget(remove)
@@ -83,7 +85,7 @@ class _FoldersPage(QWizardPage):
         layout.addLayout(row)
 
     def _add(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Select folder")
+        folder = QFileDialog.getExistingDirectory(self, "Ordner wählen")
         if folder:
             self.list.addItem(QListWidgetItem(folder))
 
@@ -98,16 +100,18 @@ class _FoldersPage(QWizardPage):
 class _OptimizePage(QWizardPage):
     def __init__(self, config: AppConfig) -> None:
         super().__init__()
-        self.setTitle("Optimize for your hardware")
+        self.setTitle("Für deine Hardware optimieren")
         self.recommended = None
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("We'll tune performance to match your machine."))
+        layout.addWidget(QLabel(
+            "Wir stimmen die Leistung auf deinen Rechner ab."
+        ))
         self.summary = QLabel("")
         self.summary.setWordWrap(True)
         layout.addWidget(self.summary)
         self.detail = QListWidget()
         layout.addWidget(self.detail)
-        btn = QPushButton("Analyze my machine")
+        btn = QPushButton("Hardware analysieren")
         btn.clicked.connect(self._analyze)
         layout.addWidget(btn)
 
@@ -118,19 +122,19 @@ class _OptimizePage(QWizardPage):
         self.summary.setText(hw.summary())
         self.detail.clear()
         for r in rec.rationale:
-            self.detail.addItem(QListWidgetItem(f"-  {r}"))
+            self.detail.addItem(QListWidgetItem(f"·   {r}"))
 
 
 class _FinishPage(QWizardPage):
     def __init__(self) -> None:
         super().__init__()
-        self.setTitle("All set")
+        self.setTitle("Fertig — los geht's")
         layout = QVBoxLayout(self)
         text = QLabel(
-            "SmartFolders is ready. The engine will start watching your folders "
-            "and you can run a full scan any time from the Dashboard.\n\n"
-            "Tip: try the search bar with phrases like \"invoices from amazon\" "
-            "or \"coding screenshots\"."
+            "SmartFolders ist bereit. Die Engine beginnt deine Ordner zu überwachen "
+            "und du kannst jederzeit über das Dashboard einen kompletten Scan starten.\n\n"
+            "Tipp: Probier oben die Suchleiste mit Sätzen wie »Zeig Rechnungen "
+            "von Amazon« oder »Coding-Screenshots«."
         )
         text.setWordWrap(True)
         layout.addWidget(text)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
@@ -36,20 +37,20 @@ class DashboardView(QWidget):
         root.setSpacing(18)
 
         header = QHBoxLayout()
-        title = QLabel("Dashboard")
+        title = QLabel("Übersicht")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
 
-        self.status_badge = Badge("Stopped", "#9aa0b4")
+        self.status_badge = Badge("Bereit", "#9aa0b4")
         header.addWidget(self.status_badge)
 
-        self.toggle_btn = QPushButton("Start engine")
+        self.toggle_btn = QPushButton("Engine starten")
         self.toggle_btn.setObjectName("Primary")
         self.toggle_btn.clicked.connect(self._toggle_engine)
         header.addWidget(self.toggle_btn)
 
-        self.scan_btn = QPushButton("Scan now")
+        self.scan_btn = QPushButton("Jetzt scannen")
         self.scan_btn.clicked.connect(lambda: self.engine.scan_now())
         header.addWidget(self.scan_btn)
         root.addLayout(header)
@@ -57,12 +58,12 @@ class DashboardView(QWidget):
         # Stat cards
         grid = QGridLayout()
         grid.setSpacing(14)
-        self.card_files = StatCard("Files indexed")
-        self.card_classified = StatCard("Classified")
-        self.card_ocr = StatCard("OCR processed")
-        self.card_size = StatCard("Total size")
-        self.card_dupes = StatCard("Duplicates")
-        self.card_queue = StatCard("In queue")
+        self.card_files = StatCard("Indexierte Dateien")
+        self.card_classified = StatCard("Klassifiziert")
+        self.card_ocr = StatCard("OCR verarbeitet")
+        self.card_size = StatCard("Gesamtgröße")
+        self.card_dupes = StatCard("Duplikate")
+        self.card_queue = StatCard("In Warteschlange")
         for i, c in enumerate(
             [self.card_files, self.card_classified, self.card_ocr,
              self.card_size, self.card_dupes, self.card_queue]
@@ -74,13 +75,13 @@ class DashboardView(QWidget):
         lower = QHBoxLayout()
         lower.setSpacing(16)
 
-        left_card = Card("Categories")
+        left_card = Card("Kategorien")
         self.cat_list = QListWidget()
         self.cat_list.setMaximumHeight(260)
         left_card.add(self.cat_list)
         lower.addWidget(left_card, 1)
 
-        right_card = Card("Recent activity")
+        right_card = Card("Letzte Aktivität")
         self.activity = QListWidget()
         right_card.add(self.activity)
         lower.addWidget(right_card, 1)
@@ -110,16 +111,28 @@ class DashboardView(QWidget):
 
     def _log_activity(self, ev: Event) -> None:
         ts = time.strftime("%H:%M:%S")
+
+        def _cat_label(value: str) -> str:
+            try:
+                return Category(value).label
+            except ValueError:
+                return str(value)
+
         text = {
-            EventType.FILE_CLASSIFIED: lambda p: f"Classified as {p.get('category')} ({int(p.get('confidence',0)*100)}%)",
-            EventType.FILE_MOVED: lambda p: f"Moved -> {p.get('new','')}",
-            EventType.FILE_RENAMED: lambda p: f"Renamed -> {p.get('new','')}",
-            EventType.DUPLICATE_FOUND: lambda p: f"{p.get('files',0)} duplicates in {p.get('groups',0)} groups",
-            EventType.RULE_APPLIED: lambda p: f"Rule '{p.get('rule')}' applied",
+            EventType.FILE_CLASSIFIED: lambda p: (
+                f"Erkannt als {_cat_label(p.get('category'))} "
+                f"({int(p.get('confidence', 0) * 100)} %)"
+            ),
+            EventType.FILE_MOVED: lambda p: f"Verschoben → {p.get('new', '')}",
+            EventType.FILE_RENAMED: lambda p: f"Umbenannt → {p.get('new', '')}",
+            EventType.DUPLICATE_FOUND: lambda p: (
+                f"{p.get('files', 0)} Duplikate in {p.get('groups', 0)} Gruppen"
+            ),
+            EventType.RULE_APPLIED: lambda p: f"Regel »{p.get('rule')}« angewendet",
         }.get(ev.type, lambda p: str(p))(ev.payload)
         path = ev.payload.get("path") or ev.payload.get("new") or ""
         name = path.split("/")[-1].split("\\")[-1] if path else ""
-        item = QListWidgetItem(f"{ts}  {name}  -  {text}")
+        item = QListWidgetItem(f"{ts}   {name}   —   {text}")
         self.activity.insertItem(0, item)
         while self.activity.count() > 200:
             self.activity.takeItem(self.activity.count() - 1)
@@ -148,15 +161,20 @@ class DashboardView(QWidget):
                 label = Category(cat_value).label
             except ValueError:
                 label = cat_value
-            self.cat_list.addItem(QListWidgetItem(f"{label}  -  {count}"))
+            self.cat_list.addItem(QListWidgetItem(f"{label}   ·   {count}"))
         if not counts:
-            self.cat_list.addItem(QListWidgetItem("No files indexed yet. Click 'Scan now'."))
+            item = QListWidgetItem(
+                "Noch keine Dateien indexiert.\nKlicke oben auf »Jetzt scannen«, "
+                "um deine überwachten Ordner einzulesen."
+            )
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+            self.cat_list.addItem(item)
 
     def _sync_status(self) -> None:
         running = self.engine.is_running
-        self.status_badge.setText("Running" if running else "Stopped")
+        self.status_badge.setText("Läuft" if running else "Bereit")
         self.status_badge.set_color("#3ecf8e" if running else "#9aa0b4")
-        self.toggle_btn.setText("Stop engine" if running else "Start engine")
+        self.toggle_btn.setText("Engine stoppen" if running else "Engine starten")
 
     def _toggle_engine(self) -> None:
         if self.engine.is_running:

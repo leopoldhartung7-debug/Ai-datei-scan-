@@ -42,44 +42,44 @@ class OptimizeView(QWidget):
         root.setSpacing(16)
 
         header = QHBoxLayout()
-        title = QLabel("AI Optimized Settings")
+        title = QLabel("KI-Optimierung")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
-        self.detect_btn = QPushButton("Analyze this machine")
+        self.detect_btn = QPushButton("Hardware analysieren")
         self.detect_btn.setObjectName("Primary")
         self.detect_btn.clicked.connect(self._detect)
         header.addWidget(self.detect_btn)
         root.addLayout(header)
 
         intro = QLabel(
-            "SmartFolders inspects your CPU, RAM, storage and GPU, then recommends "
-            "the best scan intensity, thread count, cache size and AI feature set "
-            "for your exact hardware. Review the plan and apply with one click."
+            "SmartFolders prüft CPU, RAM, Speichermedium und GPU und empfiehlt die "
+            "passende Scan-Intensität, Thread-Anzahl, Cache-Größe und KI-Funktionen "
+            "für genau deine Hardware. Empfehlung prüfen — mit einem Klick übernehmen."
         )
         intro.setObjectName("Muted")
         intro.setWordWrap(True)
         root.addWidget(intro)
 
-        self.hw_summary = QLabel("Click 'Analyze this machine' to begin.")
+        self.hw_summary = QLabel("Klicke auf »Hardware analysieren«, um zu starten.")
         self.hw_summary.setWordWrap(True)
         root.addWidget(self.hw_summary)
 
         stats_row = QHBoxLayout()
-        self.card_workers = StatCard("Worker threads", "-")
-        self.card_intensity = StatCard("Scan intensity", "-")
-        self.card_cache = StatCard("Cache size", "-")
-        self.card_ram = StatCard("RAM budget", "-")
+        self.card_workers = StatCard("Worker-Threads", "–")
+        self.card_intensity = StatCard("Scan-Intensität", "–")
+        self.card_cache = StatCard("Cache-Größe", "–")
+        self.card_ram = StatCard("RAM-Budget", "–")
         for c in (self.card_workers, self.card_intensity, self.card_cache, self.card_ram):
             stats_row.addWidget(c)
         root.addLayout(stats_row)
 
-        rationale_card = Card("Why these settings")
+        rationale_card = Card("Warum diese Einstellungen?")
         self.rationale = QListWidget()
         rationale_card.add(self.rationale)
         root.addWidget(rationale_card, 1)
 
-        self.apply_btn = QPushButton("Auto-optimize (apply recommended settings)")
+        self.apply_btn = QPushButton("Empfehlung übernehmen")
         self.apply_btn.setObjectName("Primary")
         self.apply_btn.setEnabled(False)
         self.apply_btn.clicked.connect(self._apply)
@@ -87,7 +87,7 @@ class OptimizeView(QWidget):
 
     def _detect(self) -> None:
         self.detect_btn.setEnabled(False)
-        self.hw_summary.setText("Analyzing hardware...")
+        self.hw_summary.setText("Analysiere Hardware …")
         self._worker = _DetectWorker()
         self._worker.done.connect(self._show)
         self._worker.start()

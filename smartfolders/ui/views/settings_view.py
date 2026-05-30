@@ -41,22 +41,22 @@ class SettingsView(QWidget):
         outer.setContentsMargins(28, 24, 28, 24)
 
         header = QHBoxLayout()
-        title = QLabel("Settings")
+        title = QLabel("Einstellungen")
         title.setObjectName("H1")
         header.addWidget(title)
         header.addStretch(1)
-        save_btn = QPushButton("Save changes")
+        save_btn = QPushButton("Änderungen speichern")
         save_btn.setObjectName("Primary")
         save_btn.clicked.connect(self._save)
         header.addWidget(save_btn)
         outer.addLayout(header)
 
         tabs = QTabWidget()
-        tabs.addTab(self._folders_tab(), "Folders")
-        tabs.addTab(self._ai_tab(), "AI")
-        tabs.addTab(self._performance_tab(), "Performance")
-        tabs.addTab(self._appearance_tab(), "Appearance")
-        tabs.addTab(self._maintenance_tab(), "Index & Data")
+        tabs.addTab(self._folders_tab(), "Ordner")
+        tabs.addTab(self._ai_tab(), "KI")
+        tabs.addTab(self._performance_tab(), "Leistung")
+        tabs.addTab(self._appearance_tab(), "Aussehen")
+        tabs.addTab(self._maintenance_tab(), "Index && Daten")
         outer.addWidget(tabs, 1)
 
     def _scroll(self, inner: QWidget) -> QScrollArea:
@@ -72,14 +72,14 @@ class SettingsView(QWidget):
         layout = QVBoxLayout(page)
         layout.setSpacing(14)
 
-        watched = Card("Watched folders")
+        watched = Card("Überwachte Ordner")
         self.folder_list = QListWidget()
         self.folder_list.setMaximumHeight(200)
         watched.add(self.folder_list)
         row = QHBoxLayout()
-        add_btn = QPushButton("Add folder")
+        add_btn = QPushButton("Ordner hinzufügen")
         add_btn.clicked.connect(self._add_folder)
-        rm_btn = QPushButton("Remove selected")
+        rm_btn = QPushButton("Markierte entfernen")
         rm_btn.clicked.connect(self._remove_folder)
         row.addWidget(add_btn)
         row.addWidget(rm_btn)
@@ -87,11 +87,13 @@ class SettingsView(QWidget):
         watched.body().addLayout(row)
         layout.addWidget(watched)
 
-        dest = Card("Organized destination")
-        dest.add(QLabel("Files moved by rules are placed under this root folder:"))
+        dest = Card("Zielordner für sortierte Dateien")
+        dest.add(QLabel(
+            "Von Regeln verschobene Dateien landen unter diesem Basis-Ordner:"
+        ))
         drow = QHBoxLayout()
         self.dest_edit = QLineEdit()
-        browse = QPushButton("Browse")
+        browse = QPushButton("Durchsuchen…")
         browse.clicked.connect(self._pick_dest)
         drow.addWidget(self.dest_edit, 1)
         drow.addWidget(browse)
@@ -106,22 +108,40 @@ class SettingsView(QWidget):
         layout = QVBoxLayout(page)
         layout.setSpacing(8)
 
-        card = Card("AI features")
-        self.t_ai = ToggleRow("Enable AI", "Master switch for classification, OCR and search.")
-        self.t_classify = ToggleRow("Auto-classify", "Categorize files automatically as they arrive.")
-        self.t_rename = ToggleRow("Auto-rename", "Apply smart filename suggestions automatically (invasive).")
-        self.t_move = ToggleRow("Auto-move", "Let rules move files automatically (invasive).")
-        self.t_ocr = ToggleRow("OCR", "Read text from images and scanned PDFs (needs Tesseract).")
-        self.t_search = ToggleRow("Semantic search", "Build embeddings for meaning-based search.")
-        self.t_dupes = ToggleRow("Duplicate detection", "Find identical and similar files.")
+        card = Card("KI-Funktionen")
+        self.t_ai = ToggleRow(
+            "KI aktivieren", "Hauptschalter für Klassifikation, OCR und Suche."
+        )
+        self.t_classify = ToggleRow(
+            "Automatisch klassifizieren",
+            "Neue Dateien automatisch erkennen und kategorisieren.",
+        )
+        self.t_rename = ToggleRow(
+            "Automatisch umbenennen",
+            "Smarte Dateinamen-Vorschläge automatisch übernehmen (invasiv).",
+        )
+        self.t_move = ToggleRow(
+            "Automatisch verschieben",
+            "Regeln dürfen Dateien automatisch verschieben (invasiv).",
+        )
+        self.t_ocr = ToggleRow(
+            "OCR (Texterkennung)",
+            "Text aus Bildern und gescannten PDFs lesen (benötigt Tesseract).",
+        )
+        self.t_search = ToggleRow(
+            "Semantische Suche", "Embeddings für bedeutungsbasierte Suche aufbauen."
+        )
+        self.t_dupes = ToggleRow(
+            "Duplikat-Erkennung", "Identische und ähnliche Dateien finden."
+        )
         for t in (self.t_ai, self.t_classify, self.t_rename, self.t_move,
                   self.t_ocr, self.t_search, self.t_dupes):
             card.add(t)
         layout.addWidget(card)
 
-        ocr_card = Card("OCR languages")
+        ocr_card = Card("OCR-Sprachen")
         self.ocr_lang = QLineEdit()
-        self.ocr_lang.setPlaceholderText("e.g. deu+eng")
+        self.ocr_lang.setPlaceholderText("z. B. deu+eng")
         ocr_card.add(self.ocr_lang)
         layout.addWidget(ocr_card)
         layout.addStretch(1)
@@ -133,37 +153,44 @@ class SettingsView(QWidget):
         layout = QVBoxLayout(page)
         layout.setSpacing(14)
 
-        card = Card("Resource usage")
+        card = Card("Ressourcennutzung")
+        _intensity_de = {"eco": "Eco", "balanced": "Ausgewogen", "performance": "Leistung", "turbo": "Turbo"}
         self.intensity = QComboBox()
         for it in ScanIntensity:
-            self.intensity.addItem(it.value.title(), it)
-        card.add(_labelled("Scan intensity", self.intensity))
+            self.intensity.addItem(_intensity_de.get(it.value, it.value.title()), it)
+        card.add(_labelled("Scan-Intensität", self.intensity))
 
         self.threads = QSpinBox()
         self.threads.setRange(1, 64)
-        card.add(_labelled("Worker threads", self.threads))
+        card.add(_labelled("Worker-Threads", self.threads))
 
         self.cpu_limit = QSlider(Qt.Orientation.Horizontal)
         self.cpu_limit.setRange(10, 100)
-        self.cpu_label = QLabel("CPU limit: 70%")
-        self.cpu_limit.valueChanged.connect(lambda v: self.cpu_label.setText(f"CPU limit: {v}%"))
+        self.cpu_label = QLabel("CPU-Limit: 70 %")
+        self.cpu_limit.valueChanged.connect(
+            lambda v: self.cpu_label.setText(f"CPU-Limit: {v} %")
+        )
         card.add(self.cpu_label)
         card.add(self.cpu_limit)
 
         self.ram_limit = QSpinBox()
         self.ram_limit.setRange(128, 32768)
         self.ram_limit.setSuffix(" MB")
-        card.add(_labelled("RAM budget", self.ram_limit))
+        card.add(_labelled("RAM-Budget", self.ram_limit))
 
         self.cache = QSpinBox()
         self.cache.setRange(32, 4096)
         self.cache.setSuffix(" MB")
-        card.add(_labelled("Cache size", self.cache))
+        card.add(_labelled("Cache-Größe", self.cache))
         layout.addWidget(card)
 
-        behaviour = Card("Background behaviour")
-        self.t_battery = ToggleRow("Throttle on battery", "Slow down to save power when unplugged.")
-        self.t_autostart = ToggleRow("Run at login", "Launch SmartFolders automatically.")
+        behaviour = Card("Hintergrundverhalten")
+        self.t_battery = ToggleRow(
+            "Akku-Modus", "Im Akkubetrieb herunterdrosseln, um Strom zu sparen."
+        )
+        self.t_autostart = ToggleRow(
+            "Beim Anmelden starten", "SmartFolders automatisch beim Login starten."
+        )
         behaviour.add(self.t_battery)
         behaviour.add(self.t_autostart)
         layout.addWidget(behaviour)
@@ -176,21 +203,29 @@ class SettingsView(QWidget):
         layout = QVBoxLayout(page)
         layout.setSpacing(14)
 
-        card = Card("Theme")
+        card = Card("Erscheinungsbild")
         self.theme = QComboBox()
-        self.theme.addItem("Dark", "dark")
-        self.theme.addItem("Light", "light")
+        self.theme.addItem("Dunkel", "dark")
+        self.theme.addItem("Hell", "light")
         card.add(_labelled("Theme", self.theme))
 
         self.accent = QLineEdit()
-        self.accent.setPlaceholderText("#5b8cff")
-        card.add(_labelled("Accent colour (hex)", self.accent))
+        self.accent.setPlaceholderText("#2563eb")
+        card.add(_labelled("Akzentfarbe (Hex)", self.accent))
         layout.addWidget(card)
 
-        tray = Card("Window & tray")
-        self.t_min_tray = ToggleRow("Minimize to tray", "Keep running in the system tray when minimized.")
-        self.t_close_tray = ToggleRow("Close to tray", "Closing the window keeps the engine running.")
-        self.t_notify = ToggleRow("Show notifications", "Notify on important file actions.")
+        tray = Card("Fenster & System-Tray")
+        self.t_min_tray = ToggleRow(
+            "In den Tray minimieren",
+            "Beim Minimieren weiter im System-Tray laufen lassen.",
+        )
+        self.t_close_tray = ToggleRow(
+            "Beim Schließen im Tray bleiben",
+            "Schließen des Fensters beendet die App nicht — sie läuft im Hintergrund weiter.",
+        )
+        self.t_notify = ToggleRow(
+            "Benachrichtigungen", "Bei wichtigen Datei-Aktionen benachrichtigen."
+        )
         tray.add(self.t_min_tray)
         tray.add(self.t_close_tray)
         tray.add(self.t_notify)
@@ -204,18 +239,20 @@ class SettingsView(QWidget):
         layout = QVBoxLayout(page)
         layout.setSpacing(14)
 
-        card = Card("Search index")
-        card.add(QLabel("Rebuild the full-text index or reclaim disk space."))
-        rebuild = QPushButton("Rebuild search index")
+        card = Card("Suchindex")
+        card.add(QLabel(
+            "Volltextindex neu aufbauen oder Speicherplatz zurückgewinnen."
+        ))
+        rebuild = QPushButton("Suchindex neu aufbauen")
         rebuild.clicked.connect(lambda: self.engine.db.rebuild_search_index())
-        vacuum = QPushButton("Compact database (VACUUM)")
+        vacuum = QPushButton("Datenbank komprimieren (VACUUM)")
         vacuum.clicked.connect(lambda: self.engine.db.vacuum())
         card.add(rebuild)
         card.add(vacuum)
         layout.addWidget(card)
 
-        hist = Card("History")
-        clear = QPushButton("Clear activity history")
+        hist = Card("Verlauf")
+        clear = QPushButton("Aktivitätsverlauf löschen")
         clear.setObjectName("Danger")
         clear.clicked.connect(lambda: self.engine.db.clear_history())
         hist.add(clear)

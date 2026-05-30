@@ -62,7 +62,7 @@ def test_default_rules_seeded(tmp_path):
         rules = engine.db.get_rules()
         assert len(rules) >= 3
         names = {r.name for r in rules}
-        assert "Sort invoices" in names
+        assert "Rechnungen einsortieren" in names
     finally:
         engine.close()
 

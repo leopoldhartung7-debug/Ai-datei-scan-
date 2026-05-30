@@ -132,32 +132,32 @@ def default_rules() -> list[Rule]:
     """A small, useful starter rule set seeded on first run."""
     return [
         Rule(
-            name="Sort invoices",
+            name="Rechnungen einsortieren",
             priority=10,
             conditions=[RuleCondition(ConditionField.CATEGORY, ConditionOp.EQUALS, "invoice")],
-            actions=[RuleAction(ActionType.MOVE, "Documents/Invoices")],
+            actions=[RuleAction(ActionType.MOVE, "Dokumente/Rechnungen")],
         ),
         Rule(
-            name="Sort screenshots",
+            name="Screenshots sortieren",
             priority=20,
             conditions=[RuleCondition(ConditionField.CATEGORY, ConditionOp.EQUALS, "screenshot")],
-            actions=[RuleAction(ActionType.MOVE, "Pictures/Screenshots")],
+            actions=[RuleAction(ActionType.MOVE, "Bilder/Screenshots")],
         ),
         Rule(
-            name="Group code files",
+            name="Code gruppieren",
             priority=30,
             conditions=[RuleCondition(ConditionField.CATEGORY, ConditionOp.EQUALS, "code")],
             actions=[RuleAction(ActionType.MOVE, "Code")],
         ),
         Rule(
-            name="Archive old ZIP files",
+            name="Alte ZIPs archivieren",
             priority=40,
             match_all=True,
             conditions=[
                 RuleCondition(ConditionField.EXTENSION, ConditionOp.EQUALS, "zip"),
                 RuleCondition(ConditionField.AGE_DAYS, ConditionOp.GREATER_THAN, "30"),
             ],
-            actions=[RuleAction(ActionType.ARCHIVE, "Archives")],
+            actions=[RuleAction(ActionType.ARCHIVE, "Archive")],
             enabled=False,
         ),
     ]
